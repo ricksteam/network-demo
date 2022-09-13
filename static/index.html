@@ -75,66 +75,6 @@
 
 <body>
   <div id='app'>
-    <!-- <v-app>
-      <div class="flex-container-vertical">
-        <div class="flex-item">
-          <v-card>
-            <v-card-title>
-              Input Data
-            </v-card-title>
-            <v-card-text>
-              <v-textarea outlined v-model="inputData">
-              </v-textarea>
-            </v-card-text>
-          </v-card>
-          <div class="">
-            ↓ <button type="button" @click="sendData()">Send Data</button>
-          </div>
-        </div>
-
-        <div class="flex-item">
-          <div class="flex-container-horizontal">
-            <div class="flex-item">
-              <div v-html="responseFromOne"></div>
-            </div>
-            <div class="">
-              <div class="flex-container-vertical">
-                <div class="flex-item-centered">
-                  
-                  →
-                </div>
-                <div class="flex-item-centered">
-                  ←
-                </div>
-                <div class="flex-item-centered">
-                  →
-                </div>
-                <div class="flex-item-centered">
-                  ←
-                </div>
-              </div>
-            </div>
-
-            <div class="flex-item">
-              <div class="flex-container-vertical">
-                <div class="flex-item" v-html="responseFromTwo">
-
-                </div>
-                <div class="flex-item" v-html="responseFromThree">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div>
-          ↓
-        </div>
-        <div class="flex-item">
-          output
-        </div>
-
-      </div>
-    </v-app> -->
     <v-app>
       <v-main>
         <v-container>
@@ -150,7 +90,7 @@
                   <v-container style="background-color:#EEEEEE">
                     <v-row>
                       <v-col>
-                        ↓ <v-btn @click="sendData()">Send Data</v-btn> ↓
+                        ↓ 
                       </v-col>
                     </v-row>
                     <v-row>
@@ -161,9 +101,10 @@
                             API One
                           </v-card-title>
                           <v-card-text>
-                            <v-textarea readonly v-model="responseFromOne" label="Sent to Two">
+                            <v-textarea readonly v-model="JSON.stringify(sentToTwo, null, 2)" label="Sent to Two">
                             </v-textarea>
-                            <v-textarea readonly v-model="responseFromOne" label="Sent to Three">
+
+                            <v-textarea readonly v-model="JSON.stringify(sentToThree, null, 2)" label="Sent to Three">
                             </v-textarea>
                           </v-card-text>
                         </v-card>
@@ -186,7 +127,8 @@
                                   API Two
                                 </v-card-title>
                                 <v-card-text>
-                                  <v-textarea readonly v-model="responseFromTwo" label="Response From Two">
+                                  <v-textarea readonly v-model="JSON.stringify(sentBackToOne, null, 2)"
+                                    label="Response From Two">
                                   </v-textarea>
                                 </v-card-text>
                               </v-card>
@@ -207,7 +149,7 @@
                                   API Three
                                 </v-card-title>
                                 <v-card-text>
-                                  <v-textarea readonly v-model="responseFromThree" label="Response From Three">
+                                  <v-textarea readonly v-model="JSON.stringify(responseFromThree, null, 2)" label="Response From Three">
                                   </v-textarea>
                                 </v-card-text>
                               </v-card>
@@ -223,7 +165,7 @@
                       </v-col>
                     </v-row>
                   </v-container>
-                  <v-textarea readonly v-model="outputData" label="Final Output">
+                  <v-textarea readonly v-model="JSON.stringify(outputData, null, 2)" label="Final Output">
 
                   </v-textarea>
                 </v-card-text>
@@ -263,13 +205,51 @@
       ]
     }
 
+    let dummyBounds = {
+      upperLeftLat: convoyStart.startLat + 10,
+      upperLeftLon: convoyStart.startLon + 10,
+      lowerRightLat: convoyStart.endLat - 10,
+      lowerRightLon: convoyStart.endLon - 10,
+    }
+
+    dummyMapData = {
+      nodes: [
+        { id: 0, lat: 100, lon: 200, type: "road", maxWeight: 1_000, speedLimit: 50 },
+        { id: 1, lat: 50, lon: 100, type: "bridge", maxWeight: 20, speedLimit: 25 },
+        { id: 2, lat: 75, lon: 75, type: "bridge", maxWeight: 5, speedLimit: 40 },
+        { id: 3, lat: 0, lon: -50, type: "road", maxWeight: 1_000, speedLimit: 65 },
+      ],
+      edgeList: [
+        [0, 1, 3],
+        [0, 2, 3]
+      ]
+    }
+
+    three = {
+      bounds:dummyBounds, mapData:dummyMapData, vehicles:convoyStart.vehicles
+    }
+
+    dummyPaths = [
+      { vehicleId: 0, path: [0, 1, 3] },
+      { vehicleId: 1, path: [0, 2, 3] }
+    ]
+
+    last = {
+      mapData: dummyMapData,
+      paths: dummyPaths,
+    }
+
     const app = new Vue({
       el: '#app',
       vuetify: new Vuetify(),
       data: {
         inputData: JSON.stringify(convoyStart, null, 2),
         responseData: {},
-        outputData:"None",
+        sentToTwo: dummyBounds,
+        sentBackToOne: dummyMapData,
+        responseFromThree: dummyPaths,
+        sentToThree:three,
+        outputData: last,
         rows: [
           {
             name: "One"
@@ -280,43 +260,10 @@
         ],
       },
       computed: {
-        responseFromOne() {
-          if (this.responseData?.responseFromOne)
-            return JSON.stringify(this.responseData.responseFromOne, null, 2);
-          return "NO DATA"
-        },
-        responseFromTwo() {
-          if (this.responseData?.responseFromTwo)
-            return JSON.stringify(this.responseData.responseFromTwo, null, 2);
-          return "NO DATA"
-        },
-        responseFromThree() {
-          if (this.responseData?.responseFromThree)
-            return JSON.stringify(this.responseData.responseFromThree, null, 2);
-          return "NO DATA"
-        },
+        
       },
       methods: {
-        sendData() {
-          let self = this;
-          data = JSON.parse(this.inputData);
-          fetch("/one", {
-            method: 'POST',
-            body: JSON.stringify(data),
-            headers: {
-              'Content-Type': 'application/json'
-              // 'Content-Type': 'application/x-www-form-urlencoded',
-            },
-          })
-            .then(r => r.json())
-            .then(r => {
-              console.log(r);
-              self.responseData = r;
-            })
-            .catch(error => {
-              console.error(error);
-            })
-        },
+        
 
       },
     });

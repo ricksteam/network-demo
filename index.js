@@ -27,6 +27,7 @@ app.use("/one", (req, res) => {
   }
 
   let mapData = {}
+  let fullRequest = {};
 
   axios.post("http://localhost:3000/two", dummyBounds)
     .then(r => {
@@ -37,7 +38,7 @@ app.use("/one", (req, res) => {
     })
     .then(r=>{
       let fromThree = r.data
-      res.send({ responseFromThree: fromThree, responseFromOne: dummyBounds, responseFromTwo: mapData });
+      res.send({ responseFromThree: fromThree, responseFromOne: dummyBounds, responseFromTwo: mapData, sentToThree:fullRequest});
     })
     .catch(error => {
       console.error(error);
