@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+
 <head>
   <title></title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
@@ -7,7 +8,8 @@
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
   <link href="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" rel="icon"
-    type="image/x-icon" /><!--tiny.cc/emptyimage-->
+    type="image/x-icon" />
+  <!--tiny.cc/emptyimage-->
 </head>
 
 <body>
@@ -16,11 +18,29 @@
       <v-main>
         <v-container>
           <v-row>
-            <v-col cols=12 v-for="row in rows" :key="row.name">
+            <v-col cols=12>
               <v-card>
                 <v-card-title>
-                  {{row.name}}
+                  Input Data
                 </v-card-title>
+                <v-card-text>
+                  <v-textarea v-model="inputData">
+                  </v-textarea>
+                </v-card-text>
+              </v-card>
+            </v-col>
+            <v-col>
+              <v-btn @click="sendData()">Send Data</v-btn>
+            </v-col>
+            <v-col cols=12>
+              <v-card>
+                <v-card-title>
+                  Response Data
+                </v-card-title>
+                <v-card-text>
+                  <v-textarea readonly v-model="JSON.stringify(responseData)">
+                  </v-textarea>
+                </v-card-text>
               </v-card>
             </v-col>
           </v-row>
@@ -36,10 +56,31 @@
 
   <script>
 
+    convoyStart = {
+      startLat : 100,
+      startLon : 200,
+      endLat : 0,
+      endLon: -50,
+      vehicles:[
+        {
+          name:"Big Vehicle",
+          maxSpeed:45,
+          weight:10,
+        },
+        {
+          name:"Light Vehicle",
+          maxSpeed:65,
+          weight:2,
+        }
+      ]
+    }
+
     const app = new Vue({
       el: '#app',
       vuetify: new Vuetify(),
       data: {
+        inputData:JSON.stringify(convoyStart, null, 2),
+        responseData:{},
         rows: [
           {
             name: "One"
@@ -50,10 +91,21 @@
         ],
       },
       methods: {
-
+        sendData(){
+          data = JSON.parse(this.inputData);
+          fetch("/one")
+          .then(r=>r.json())
+          .then(r=>{
+            console.log(r);
+          })
+          .catch(error=>{
+            console.error(error);
+          })
+        }
       },
     });
 
   </script>
 </body>
+
 </html>
