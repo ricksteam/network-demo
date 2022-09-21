@@ -206,11 +206,15 @@
     }
 
     let dummyBounds = {
-      upperLeftLat: convoyStart.startLat + 10,
-      upperLeftLon: convoyStart.startLon + 10,
-      lowerRightLat: convoyStart.endLat - 10,
-      lowerRightLon: convoyStart.endLon - 10,
+	"upperLeft": {
+    	"latitude": 110.0,
+        "longitude": 2100.0
+    },
+    "lowerRight": {
+    	"latitude": -10.0,
+        "longitude": -60.0
     }
+}
 
     dummyMapData = {
       nodes: [
